@@ -1,13 +1,14 @@
 'use strict';
 
-module.exports = { // eslint-disable-line
-  name: 'process-dir',
-  version: '0.0.1',
-  cwd: __dirname,
+const pkg = require('../package.json');
+
+module.exports = {
+  name: pkg.name,
+  version: pkg.version,
   local: {
     type: 'cmd',
     cmd: 'python',
-    args: ['./rigid_regress.py'],
+    args: ['./ridge_regress.py'],
     verbose: true,
   },
   remote: {
