@@ -2,13 +2,13 @@
 
 const pkg = require('../package.json');
 
-module.exports = { // eslint-disable-line
+module.exports = {
   name: pkg.name,
   version: pkg.version,
   local: {
     type: 'cmd',
     cmd: 'python',
-    args: ['./rigid_regress.py'],
+    args: ['./ridge_regress.py'],
     verbose: true,
   },
   remote: {
