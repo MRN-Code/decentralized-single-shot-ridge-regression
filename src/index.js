@@ -1,9 +1,10 @@
 'use strict';
 
+const pkg = require('../package.json');
+
 module.exports = { // eslint-disable-line
-  name: 'process-dir',
-  version: '0.0.1',
-  cwd: __dirname,
+  name: pkg.name,
+  version: pkg.version,
   local: {
     type: 'cmd',
     cmd: 'python',
