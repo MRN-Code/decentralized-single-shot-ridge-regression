@@ -4,9 +4,8 @@ from os import listdir
 from os.path import isfile, join
 import sys
 import numpy as np
-import scipy as spy
-from  scipy.stats import linregress
-
+import sklearn
+import sklearn.linear_model
 
 parser = argparse.ArgumentParser(description='help read in my data from my local machine!')
 parser.add_argument('--run', type=str,  help='grab coinstac args')
@@ -31,18 +30,21 @@ files = [f for f in listdir(passedDir) if isfile(join(passedDir, f))]
 
 ### calculate the beta from each site ###
 
-allFileData = {}
-meanData = {}
+# allFileData = {}
+
 for f in files:
     
     data=np.load(join(passedDir,f))
-    x=data[:,0]
-    label=data[:,1]
-    result=linregress(x,label)    
+    x=data[:,:-1]
+    label=data[:,-1]
+#    result=linregress(x,label)    
 #    allFileData[f] = np.load(join(passedDir, f))
+    clf=sklearn.linear_model.Ridge(alpha=1.0,fit_intercept=True,normalize=False,copy_X=True,max_iter=None,tol=0.001,solver='auto',random_state=None)
+     
+    result=clf.fit(x,label)
+    beta_vector=np.insert(result.coef_,0,result.intercept_)
 
-
-computationOutput = json.dumps({'beta0':result[1],'beta1':result[0]}, sort_keys=True, indent=4, separators=(',', ': '))
+computationOutput = json.dumps({'beta_vector': beta_vector.tolist()}, sort_keys=True, indent=4, separators=(',', ': '))
 
 # preview output data
 # sys.stderr.write(computationOutput + "\n")
