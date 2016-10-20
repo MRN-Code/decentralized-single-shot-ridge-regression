@@ -10,9 +10,13 @@
     "Ross Kelly <rkelly@mrn.org>"
   ],
   "description": "Single shot implementation of ridge regression in python for COINSTAC.",
+  "dependencies": {
+    "freesurfer-parser": "0.0.2"
+  },
   "devDependencies": {
     "coinstac-simulator": "^2.1.0",
-    "cross-env": "^3.1.3"
+    "cross-env": "^3.1.3",
+    "tape": "^4.6.2"
   },
   "homepage": "https://github.com/MRN-Code/decentralized-single-shot-ridge-regression#readme",
   "keywords": [
@@ -29,7 +33,8 @@
     "url": "git+https://github.com/MRN-Code/decentralized-single-shot-ridge-regression.git"
   },
   "scripts": {
-    "test": "cross-env BLUEBIRD_WARNINGS=0 coinstac-simulator -d test/declaration.js"
+    "simulate": "cross-env BLUEBIRD_WARNINGS=0 coinstac-simulator -d test/declaration.js",
+    "test": "node test/index.js"
   },
   "version": "1.0.0"
 }

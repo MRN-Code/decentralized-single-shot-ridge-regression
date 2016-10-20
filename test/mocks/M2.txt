@@ -10,7 +10,7 @@ Left-Pallidum 1800
 3rd-Ventricle 700
 4th-Ventricle 1050
 Brain-Stem 20100
-Left-Hippocampus 4100
+Left-Hippocampus 4200
 Left-Amygdala 1450
 CSF 1100
 Left-Accumbens-area 650
