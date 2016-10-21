@@ -5,6 +5,7 @@ const path = require('path');
 const tape = require('tape');
 
 const preprocess = computation.local[0].fn;
+const remote = computation.remote.fn;
 
 tape('local preprocessing: errors', t => {
   t.plan(5);
@@ -99,5 +100,51 @@ tape('local preprocessing', t => {
       );
     })
     .catch(t.end);
+});
+
+tape('remote function', t => {
+  const betas = [
+    [1, 2, 3, 4],
+    [5, 6, 7, 8],
+    [9, 10, 11, 12],
+  ];
+  const usernames = ['wrangler', 'econoline', 'forester'];
+
+  t.notOk(
+    remote({
+      usernames,
+      userResults: [{
+        data: {
+          beta_vector: betas[0],
+        },
+        username: usernames[0],
+      }, {
+        data: {
+          beta_vector: betas[1],
+        },
+        username: usernames[1],
+      }, {
+        username: usernames[2],
+      }],
+    }).complete,
+    'doesn\'t mark complete when user lacks data'
+  );
+  t.deepEqual(
+    remote({
+      usernames,
+      userResults: usernames.map((username, i) => ({
+        data: {
+          beta_vector: betas[i],
+        },
+        username,
+      })),
+    }),
+    {
+      averageBetaVector: [5, 6, 7, 8],
+      complete: true,
+    },
+    'computes average beta'
+  );
+  t.end();
 });
 
