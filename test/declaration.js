@@ -17,8 +17,8 @@ module.exports = {
         },
       ],
       metaCovariateMapping: {
-        '2': 0,
-        '3': 1,
+        2: 0,
+        3: 1,
       },
       metaFile: [
         ['filename', 'is control', 'age'],
@@ -37,8 +37,8 @@ module.exports = {
         },
       ],
       metaCovariateMapping: {
-        '2': 1,
-        '3': 0,
+        2: 1,
+        3: 0,
       },
       metaFile: [
         ['File', 'Age', 'IsControl'],
