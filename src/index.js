@@ -58,8 +58,13 @@ module.exports = {
   local: [{
     type: 'function',
     fn(opts) {
-      const features = ((((opts.remoteResult || {}).pluginState || {}).inputs || [])[0] || [])[0];
+      let features = ((((opts.remoteResult || {}).pluginState || {}).inputs || [])[0] || [])[0];
       const files = (opts.userData || {}).files;
+
+      // TODO: This is a hack for simulator. Figure out how to load plugin state
+      if (!features && opts.userData.__FEATURES__) {
+        features = opts.userData.__FEATURES__;
+      }
 
       if (!Array.isArray(features) || !features.length) {
         return Promise.reject(new Error('Expected RoI features inputs'));

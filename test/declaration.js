@@ -2,12 +2,14 @@
 
 const path = require('path');
 
+const features = ['Left-Hippocampus'];
 const mocksPath = path.join(__dirname, 'mocks');
 
 module.exports = {
   computationPath: path.resolve(__dirname, '../src/index.js'),
   local: [
     {
+      __FEATURES__: features,
       files: [
         {
           filename: path.join(mocksPath, 'M1.txt'),
@@ -27,6 +29,7 @@ module.exports = {
       name: 'project-1',
     },
     {
+      __FEATURES__: features,
       files: [
         {
           filename: path.join(mocksPath, 'M3.txt'),
