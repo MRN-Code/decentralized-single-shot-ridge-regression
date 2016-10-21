@@ -61,14 +61,14 @@ module.exports = {
       const features = ((((opts.remoteResult || {}).pluginState || {}).inputs || [])[0] || [])[0];
       const files = (opts.userData || {}).files;
 
-      if (
-        !Array.isArray(features) ||
-        !features.length ||
-        features.some(f => FreeSurfer.validFields.indexOf(f) < 0) ||
-        !Array.isArray(files) ||
-        !files.length
-      ) {
-        return Promise.reject(new Error('Bad local input'));
+      if (!Array.isArray(features) || !features.length) {
+        return Promise.reject(new Error('Expected RoI features inputs'));
+      } else if (features.some(f => FreeSurfer.validFields.indexOf(f) < 0)) {
+        return Promise.reject(new Error(
+          `Invalid FreeSurfer feature in ${features.toString()}`
+        ));
+      } else if (!Array.isArray(files) || !files.length) {
+        return Promise.reject(new Error('Expected user data to contain files'));
       }
 
       const pickFeature = getFreeSurferDataPicker(features[0]);
