@@ -11,19 +11,18 @@ module.exports = {
       files: [
         {
           filename: path.join(mocksPath, 'M1.txt'),
+          tags: {
+            isControl: 1,
+            age: 36,
+          },
         },
         {
           filename: path.join(mocksPath, 'M2.txt'),
+          tags: {
+            isControl: 0,
+            age: 35,
+          },
         },
-      ],
-      metaCovariateMapping: {
-        2: 0,
-        3: 1,
-      },
-      metaFile: [
-        ['filename', 'is control', 'age'],
-        ['M1.txt', '1', '36'],
-        ['M2.txt', '0', '55'],
       ],
       name: 'project-1',
     },
@@ -31,19 +30,18 @@ module.exports = {
       files: [
         {
           filename: path.join(mocksPath, 'M3.txt'),
+          tags: {
+            isControl: true,
+            age: 27,
+          },
         },
         {
           filename: path.join(mocksPath, 'M4.txt'),
+          tags: {
+            isControl: false,
+            age: 56,
+          },
         },
-      ],
-      metaCovariateMapping: {
-        2: 1,
-        3: 0,
-      },
-      metaFile: [
-        ['File', 'Age', 'IsControl'],
-        ['M3.txt', '27', true],
-        ['M4.txt', '48', false],
       ],
       name: 'project-2',
     },
