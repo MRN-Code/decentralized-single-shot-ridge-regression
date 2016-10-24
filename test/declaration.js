@@ -14,14 +14,14 @@ module.exports = {
         {
           filename: path.join(mocksPath, 'M1.txt'),
           tags: {
-            isControl: 1,
+            isControl: true,
             age: 36,
           },
         },
         {
           filename: path.join(mocksPath, 'M2.txt'),
           tags: {
-            isControl: 0,
+            isControl: false,
             age: 35,
           },
         },
