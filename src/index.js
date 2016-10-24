@@ -109,17 +109,22 @@ module.exports = {
         return {};
       }
 
+      const averageBetaVector = userResults[0].data.beta_vector.reduce(
+        (memo, col, index) => memo.concat(userResults.reduce(
+          (sum, userResult) => sum + userResult.data.beta_vector[index],
+          0
+        ) / userResults.length),
+        []
+      );
+
+      console.log('Average beta vector:', averageBetaVector);
+
       return {
-        averageBetaVector: userResults[0].data.beta_vector.reduce(
-          (memo, col, index) => memo.concat(userResults.reduce(
-            (sum, userResult) => sum + userResult.data.beta_vector[index],
-            0
-          ) / userResults.length),
-          []
-        ),
+        averageBetaVector,
         complete: true,
       };
     },
+    verbose: true,
   },
   plugins: ['group-step', 'inputs'],
 };
