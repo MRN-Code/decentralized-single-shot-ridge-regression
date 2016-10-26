@@ -1,3 +1,4 @@
+
 import json;
 import argparse
 from os import listdir
@@ -23,26 +24,26 @@ if 'remoteResult' in args.run and \
     username in args.run['remoteResult']['data']:
     sys.exit(0); # no-op!  we already contributed our data
 
-passedDir = args.run['userData']['dirs'][0]
-sys.stderr.write("reading files from dir: " + passedDir)
 
-files = [f for f in listdir(passedDir) if isfile(join(passedDir, f))]
+### read in from userData
+
+#passedDir = args.run['userData']['dirs'][0]
+sys.stderr.write("reading data from node: " + username+"\n")
+
+x=args.run['previousData']['X']
+y=args.run['previousData']['y']
+
+#### check the input #####
+sys.stderr.write("x is "+str(x)+"\n")
+sys.stderr.write("y is "+str(y)+"\n")
 
 ### calculate the beta from each site ###
 
-# allFileData = {}
-
-for f in files:
-    
-    data=np.load(join(passedDir,f))
-    x=data[:,:-1]
-    label=data[:,-1]
-#    result=linregress(x,label)    
-#    allFileData[f] = np.load(join(passedDir, f))
-    clf=sklearn.linear_model.Ridge(alpha=1.0,fit_intercept=True,normalize=False,copy_X=True,max_iter=None,tol=0.001,solver='auto',random_state=None)
+clf=sklearn.linear_model.Ridge(alpha=1.0,fit_intercept=True,normalize=False,copy_X=True,max_iter=None,tol=0.001,solver='auto',random_state=None)
      
-    result=clf.fit(x,label)
-    beta_vector=np.insert(result.coef_,0,result.intercept_)
+result=clf.fit(x,y)
+beta_vector=np.insert(result.coef_,0,result.intercept_)
+sys.stderr.write("the beta_vector is" + str(beta_vector.tolist()))
 
 computationOutput = json.dumps({'beta_vector': beta_vector.tolist()}, sort_keys=True, indent=4, separators=(',', ': '))
 
