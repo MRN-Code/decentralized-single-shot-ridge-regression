@@ -10,9 +10,11 @@ const pkg = require('../package.json');
  * @param {string} feature
  * @returns {Function} FreeSurfer data picker
  */
+/* eslint-disable arrow-parens,arrow-body-style */
 const getFreeSurferDataPicker = feature => freeSurferData => {
   return new FreeSurfer({ string: freeSurferData })[feature];
 };
+/* eslint-enable arrow-parens,arrow-body-style */
 
 /**
  * Read file.
@@ -62,9 +64,11 @@ module.exports = {
       const files = (opts.userData || {}).files;
 
       // TODO: This is a hack for simulator. Figure out how to load plugin state
+      /* eslint-disable no-underscore-dangle */
       if (!features && opts.userData.__FEATURES__) {
         features = opts.userData.__FEATURES__;
       }
+      /* eslint-enable no-underscore-dangle */
 
       if (!Array.isArray(features) || !features.length) {
         return Promise.reject(new Error('Expected RoI features inputs'));
@@ -117,7 +121,9 @@ module.exports = {
         []
       );
 
+      /* eslint-disable no-console */
       console.log('Average beta vector:', averageBetaVector);
+      /* eslint-enable no-console */
 
       return {
         averageBetaVector,

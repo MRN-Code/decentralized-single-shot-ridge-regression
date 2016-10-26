@@ -7,6 +7,7 @@ const tape = require('tape');
 const preprocess = computation.local[0].fn;
 const remote = computation.remote.fn;
 
+/* eslint-disable arrow-parens */
 tape('local preprocessing: errors', t => {
   t.plan(5);
 
@@ -147,4 +148,5 @@ tape('remote function', t => {
   );
   t.end();
 });
+/* eslint-enable arrow-parens */
 
