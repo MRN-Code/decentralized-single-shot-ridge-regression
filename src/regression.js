@@ -1,8 +1,8 @@
-'se strict';
+'use strict';
 const n = require('numeric');
 
 module.exports = {
-  defaultLambda: 0.0,
+  defaultLambda: 1,
 
   objective(w, xVals, yVals, lambda) {
     const localLambda = lambda || this.defaultLambda;
@@ -15,6 +15,6 @@ module.exports = {
     console.log('xVals are:',xVals);
     console.log('yVals are:',yVals);
     console.log('localInitialMVals are:',localInitialMVals);
-    return n.uncmin(w => this.objective(w, xVals, yVals), localInitialMVals).solution;
+    return n.uncmin(w => this.objective(w, xVals, yVals), localInitialMVals,0.0001).solution;
   },
 }
