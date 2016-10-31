@@ -111,6 +111,7 @@ module.exports = {
    //    console.log('beta vector is:',beta);
    //   return beta 
     const previousData=opts.previousData;
+   // add bias for X 
     for (var i=0; i<opts.previousData.X.length; i++){ 
      previousData.X[i].splice(0,0,1);
     }
@@ -119,7 +120,8 @@ module.exports = {
     console.log('X is:',previousData.X);
     console.log('y is:',previousData.y);
     console.log('beta vector is:',beta_vector);
-    return beta_vector;
+    const beta_vector_json={'beta_vector':beta_vector};
+    return beta_vector_json;
   }
  }],
   remote: {
