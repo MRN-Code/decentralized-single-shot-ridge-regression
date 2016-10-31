@@ -1,5 +1,6 @@
 'use strict';
 
+const regression=require('./regression');
 const fs = require('fs');
 const FreeSurfer = require('freesurfer-parser');
 const pkg = require('../package.json');
@@ -98,11 +99,29 @@ module.exports = {
       type: 'covariates',
     }],
   }, {
-    type: 'cmd',
-    cmd: 'python',
-    args: ['./ridge_regress.py'],
-    verbose: true,
-  }],
+// oneshotridgeregression begin 
+    type: 'function',
+//    cmd: 'python',
+//    args: ['./ridge_regress.py'],
+//    verbose: true,
+   // get dimension of the data
+    fn(opts) {
+
+   //   const beta=regression.oneShot(opts.previousData.X,opts.previousData.y)
+   //    console.log('beta vector is:',beta);
+   //   return beta 
+    const previousData=opts.previousData;
+    for (var i=0; i<opts.previousData.X.length; i++){ 
+     previousData.X[i].splice(0,0,1);
+    }
+    
+    let beta_vector=regression.oneShot(previousData.X,previousData.y);
+    console.log('X is:',previousData.X);
+    console.log('y is:',previousData.y);
+    console.log('beta vector is:',beta_vector);
+    return beta_vector;
+  }
+ }],
   remote: {
     type: 'function',
     fn(opts) {
