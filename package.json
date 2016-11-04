@@ -11,7 +11,8 @@
   ],
   "description": "Single shot implementation of ridge regression in python for COINSTAC.",
   "dependencies": {
-    "freesurfer-parser": "0.0.2"
+    "freesurfer-parser": "0.0.2",
+    "numeric": "^1.2.6"
   },
   "devDependencies": {
     "coinstac-simulator": "^2.1.1",
@@ -34,7 +35,10 @@
   "license": "MIT",
   "main": "src/index.js",
   "name": "decentralized-single-shot-ridge-regression",
-  "pre-commit": ["lint", "test"],
+  "pre-commit": [
+    "lint",
+    "test"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MRN-Code/decentralized-single-shot-ridge-regression.git"
