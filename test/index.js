@@ -116,12 +116,12 @@ tape('remote function', t => {
       usernames,
       userResults: [{
         data: {
-          beta_vector: betas[0],
+          betaVector: betas[0],
         },
         username: usernames[0],
       }, {
         data: {
-          beta_vector: betas[1],
+          betaVector: betas[1],
         },
         username: usernames[1],
       }, {
@@ -135,7 +135,7 @@ tape('remote function', t => {
       usernames,
       userResults: usernames.map((username, i) => ({
         data: {
-          beta_vector: betas[i],
+          betaVector: betas[i],
         },
         username,
       })),

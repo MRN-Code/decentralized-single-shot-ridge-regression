@@ -1,5 +1,6 @@
 'use strict';
 
+const regression = require('./regression');
 const fs = require('fs');
 const FreeSurfer = require('freesurfer-parser');
 const pkg = require('../package.json');
@@ -98,10 +99,22 @@ module.exports = {
       type: 'covariates',
     }],
   }, {
-    type: 'cmd',
-    cmd: 'python',
-    args: ['./ridge_regress.py'],
-    verbose: true,
+    type: 'function',
+    fn(opts) {
+      const previousData = opts.previousData;
+
+      for (let i = 0; i < opts.previousData.X.length; i += 1) {
+        previousData.X[i].splice(0, 0, 1);
+      }
+
+      const betaVector = regression.oneShot(previousData.X, previousData.y);
+      /* eslint-disable no-console */
+      console.log('X is:', previousData.X);
+      console.log('y is:', previousData.y);
+      console.log('beta vector is:', betaVector);
+      /* eslint-enable no-console */
+      return { betaVector };
+    },
   }],
   remote: {
     type: 'function',
@@ -109,13 +122,13 @@ module.exports = {
       const userResults = opts.userResults;
 
       // Not all user results contain betas. Return early.
-      if (userResults.some(userResult => !((userResult || {}).data || {}).beta_vector)) {
+      if (userResults.some(userResult => !((userResult || {}).data || {}).betaVector)) {
         return {};
       }
 
-      const averageBetaVector = userResults[0].data.beta_vector.reduce(
+      const averageBetaVector = userResults[0].data.betaVector.reduce(
         (memo, col, index) => memo.concat(userResults.reduce(
-          (sum, userResult) => sum + userResult.data.beta_vector[index],
+          (sum, userResult) => sum + userResult.data.betaVector[index],
           0
         ) / userResults.length),
         []
