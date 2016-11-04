@@ -107,14 +107,13 @@ module.exports = {
         previousData.X[i].splice(0, 0, 1);
       }
 
-      const beta_vector = regression.oneShot(previousData.X, previousData.y);
+      const betaVector = regression.oneShot(previousData.X, previousData.y);
       /* eslint-disable no-console */
       console.log('X is:', previousData.X);
       console.log('y is:', previousData.y);
-      console.log('beta vector is:', beta_vector);
+      console.log('beta vector is:', betaVector);
       /* eslint-enable no-console */
-      const beta_vector_json = { 'beta_vector': beta_vector };
-      return beta_vector_json;
+      return { betaVector };
     },
   }],
   remote: {
@@ -123,13 +122,13 @@ module.exports = {
       const userResults = opts.userResults;
 
       // Not all user results contain betas. Return early.
-      if (userResults.some(userResult => !((userResult || {}).data || {}).beta_vector)) {
+      if (userResults.some(userResult => !((userResult || {}).data || {}).betaVector)) {
         return {};
       }
 
-      const averageBetaVector = userResults[0].data.beta_vector.reduce(
+      const averageBetaVector = userResults[0].data.betaVector.reduce(
         (memo, col, index) => memo.concat(userResults.reduce(
-          (sum, userResult) => sum + userResult.data.beta_vector[index],
+          (sum, userResult) => sum + userResult.data.betaVector[index],
           0
         ) / userResults.length),
         []
