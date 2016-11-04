@@ -1,6 +1,6 @@
 'use strict';
 
-const regression=require('./regression');
+const regression = require('./regression');
 const fs = require('fs');
 const FreeSurfer = require('freesurfer-parser');
 const pkg = require('../package.json');
@@ -99,31 +99,24 @@ module.exports = {
       type: 'covariates',
     }],
   }, {
-// oneshotridgeregression begin 
     type: 'function',
-//    cmd: 'python',
-//    args: ['./ridge_regress.py'],
-//    verbose: true,
-   // get dimension of the data
     fn(opts) {
+      const previousData = opts.previousData;
 
-   //   const beta=regression.oneShot(opts.previousData.X,opts.previousData.y)
-   //    console.log('beta vector is:',beta);
-   //   return beta 
-    const previousData=opts.previousData;
-   // add bias for X 
-    for (var i=0; i<opts.previousData.X.length; i++){ 
-     previousData.X[i].splice(0,0,1);
-    }
-    
-    let beta_vector=regression.oneShot(previousData.X,previousData.y);
-    console.log('X is:',previousData.X);
-    console.log('y is:',previousData.y);
-    console.log('beta vector is:',beta_vector);
-    const beta_vector_json={'beta_vector':beta_vector};
-    return beta_vector_json;
-  }
- }],
+      for (let i = 0; i < opts.previousData.X.length; i += 1) {
+        previousData.X[i].splice(0, 0, 1);
+      }
+
+      const beta_vector = regression.oneShot(previousData.X, previousData.y);
+      /* eslint-disable no-console */
+      console.log('X is:', previousData.X);
+      console.log('y is:', previousData.y);
+      console.log('beta vector is:', beta_vector);
+      /* eslint-enable no-console */
+      const beta_vector_json = { 'beta_vector': beta_vector };
+      return beta_vector_json;
+    },
+  }],
   remote: {
     type: 'function',
     fn(opts) {
