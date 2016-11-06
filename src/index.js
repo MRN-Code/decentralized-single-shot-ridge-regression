@@ -3,6 +3,7 @@
 const regression = require('./regression');
 const fs = require('fs');
 const FreeSurfer = require('freesurfer-parser');
+const get = require('lodash/get');
 const pkg = require('../package.json');
 
 /**
@@ -61,8 +62,8 @@ module.exports = {
   local: [{
     type: 'function',
     fn(opts) {
-      let features = ((((opts.remoteResult || {}).pluginState || {}).inputs || [])[0] || [])[0];
-      const files = (opts.userData || {}).files;
+      let features = get(opts, 'remoteResult.pluginState.inputs[0][0]');
+      const files = get(opts, 'userData.files');
 
       // TODO: This is a hack for simulator. Figure out how to load plugin state
       /* eslint-disable no-underscore-dangle */
