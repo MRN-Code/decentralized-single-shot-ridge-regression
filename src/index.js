@@ -127,13 +127,15 @@ module.exports = {
         return {};
       }
 
-      const averageBetaVector = userResults[0].data.betaVector.reduce(
-        (memo, col, index) => memo.concat(userResults.reduce(
-          (sum, userResult) => sum + userResult.data.betaVector[index],
-          0
-        ) / userResults.length),
-        []
-      );
+      const averageBetaVector = [];
+      const betaCount = userResults[0].data.betaVector.length;
+      const userCount = userResults.length;
+
+      for (let i = 0; i < betaCount; i += 1) {
+        averageBetaVector.push(userResults.reduce(
+          (sum, userResult) => sum + userResult.data.betaVector[i], 0
+        ) / userCount);
+      }
 
       /* eslint-disable no-console */
       console.log('Average beta vector:', averageBetaVector);
