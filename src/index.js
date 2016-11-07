@@ -3,6 +3,7 @@
 const regression = require('./regression');
 const fs = require('fs');
 const FreeSurfer = require('freesurfer-parser');
+const get = require('lodash/get');
 const pkg = require('../package.json');
 
 /**
@@ -61,8 +62,8 @@ module.exports = {
   local: [{
     type: 'function',
     fn(opts) {
-      let features = ((((opts.remoteResult || {}).pluginState || {}).inputs || [])[0] || [])[0];
-      const files = (opts.userData || {}).files;
+      let features = get(opts, 'remoteResult.pluginState.inputs[0][0]');
+      const files = get(opts, 'userData.files');
 
       // TODO: This is a hack for simulator. Figure out how to load plugin state
       /* eslint-disable no-underscore-dangle */
@@ -126,13 +127,15 @@ module.exports = {
         return {};
       }
 
-      const averageBetaVector = userResults[0].data.betaVector.reduce(
-        (memo, col, index) => memo.concat(userResults.reduce(
-          (sum, userResult) => sum + userResult.data.betaVector[index],
-          0
-        ) / userResults.length),
-        []
-      );
+      const averageBetaVector = [];
+      const betaCount = userResults[0].data.betaVector.length;
+      const userCount = userResults.length;
+
+      for (let i = 0; i < betaCount; i += 1) {
+        averageBetaVector.push(userResults.reduce(
+          (sum, userResult) => sum + userResult.data.betaVector[i], 0
+        ) / userCount);
+      }
 
       /* eslint-disable no-console */
       console.log('Average beta vector:', averageBetaVector);
