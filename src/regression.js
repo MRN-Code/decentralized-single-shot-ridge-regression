@@ -15,7 +15,7 @@ module.exports = {
     console.log('xVals are:',xVals);
     console.log('yVals are:',yVals);
     console.log('localInitialMVals are:',localInitialMVals);
-    return n.uncmin(w => this.objective(w, xVals, yVals), localInitialMVals,0.01).solution;
+    return n.uncmin(w => this.objective(w, xVals, yVals), localInitialMVals,0.001).solution;
   },
 
   rSquared(xVals,yVals,betaVector) {
