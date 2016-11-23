@@ -109,10 +109,14 @@ module.exports = {
       }
 
       const betaVector = regression.oneShot(previousData.X, previousData.y);
+      const rSquared = regression.rSquared(previousData.X,previousData.y,betaVector);
+      const tValue = regression.tValue(previousData.X,previousData.y,betaVector);
       /* eslint-disable no-console */
       console.log('X is:', previousData.X);
       console.log('y is:', previousData.y);
       console.log('beta vector is:', betaVector);
+      console.log('r square of fitting is:', rSquared);
+      console.log('tValues of betaVector are:', tValue);
       /* eslint-enable no-console */
       return { betaVector };
     },
