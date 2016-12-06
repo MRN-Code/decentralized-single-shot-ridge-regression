@@ -123,7 +123,7 @@ module.exports = {
       const userResults = opts.userResults;
 
       // Not all user results contain betas. Return early.
-      if (userResults.some(userResult => !((userResult || {}).data || {}).betaVector)) {
+      if (userResults.some(userResult => !get(userResult, 'data.betaVector'))) {
         return {};
       }
 
