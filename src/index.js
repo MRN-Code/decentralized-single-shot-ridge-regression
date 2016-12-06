@@ -5,6 +5,7 @@ const fs = require('fs');
 const FreeSurfer = require('freesurfer-parser');
 const get = require('lodash/get');
 const pkg = require('../package.json');
+const n=require('numeric');
 
 /**
  * Get FreeSurfer region of interest picker.
@@ -100,6 +101,7 @@ module.exports = {
       type: 'covariates',
     }],
   }, {
+    // step one: calculate regression result and local_meanY 
     type: 'function',
     fn(opts) {
       const previousData = opts.previousData;
@@ -111,17 +113,32 @@ module.exports = {
       const betaVector = regression.oneShot(previousData.X, previousData.y);
       const rSquared = regression.rSquared(previousData.X,previousData.y,betaVector);
       const tValue = regression.tValue(previousData.X,previousData.y,betaVector);
+      const local_meanY= n.sum(previousData.y)/previousData.y.length;
       /* eslint-disable no-console */
       console.log('X is:', previousData.X);
       console.log('y is:', previousData.y);
       console.log('beta vector is:', betaVector);
-      console.log('r square of fitting is:', rSquared);
-      console.log('tValues of betaVector are:', tValue);
+      console.log('local r square of fitting is:', rSquared);
+      console.log('local tValues of betaVector are:', tValue);
       /* eslint-enable no-console */
-      return { betaVector };
-    },
+      return { 'betaVector':betaVector,'local_meanY':local_meanY,'local_n':previousData.y.length };
+      },
+      
+    }, {
+     // step two: receive the global_meanY and calculate part of (y-global_meanY).^2
+     type: 'function',
+     fn(opts) {
+        
+        const remoteResults=opts.remoteResults;
+        const global_meanY=remoteResults.global_meanY;
+        console.log('global_meanY:',global_meanY);
+        console.log('previousData is:',opts.previousData[0]);
+        const SST_node=6765;
+        return { SST_node };
+     },
+     
   }],
-  remote: {
+  remote: [{
     type: 'function',
     fn(opts) {
       const userResults = opts.userResults;
@@ -140,17 +157,33 @@ module.exports = {
           (sum, userResult) => sum + userResult.data.betaVector[i], 0
         ) / userCount);
       }
-
+      
+      const global_meanY=765;
       /* eslint-disable no-console */
       console.log('Average beta vector:', averageBetaVector);
       /* eslint-enable no-console */
+      console.log('opts.userResults:', userResults[0]);
 
       return {
         averageBetaVector,
-        complete: true,
+        global_meanY,
+//        complete: true,
       };
     },
     verbose: true,
-  },
+  },{
+    // get SST_node from each local node and calculate the statistics
+     type:'function',
+     fn(opts) {
+     const userResults = opts.userResults;
+//     console.log('opts.userResults:',opts.userResults[0]);
+     const SST_node1=opts.userResults[0].data.SST_node;
+     return {
+       SST_node1,
+       complete : true,
+      };
+     },
+     verbose: true,
+   }],
   plugins: ['group-step', 'inputs'],
 };
