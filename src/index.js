@@ -91,14 +91,15 @@ module.exports = {
           const y = freeSurferDatas.map(pickFeature); // RoIs
 
           // calculate regression result and localMeanY
+          const biasedX = x.map(covariates => [1].concat(covariates));
           const localCount = y.length;
-          const betaVector = regression.oneShot(x, y);
-          const rSquared = regression.rSquared(x, y, betaVector);
-          const tValue = regression.tValue(x, y, betaVector);
+          const betaVector = regression.oneShot(biasedX, y);
+          const rSquared = regression.rSquared(biasedX, y, betaVector);
+          const tValue = regression.tValue(biasedX, y, betaVector);
           const localMeanY = n.sum(y) / localCount;
 
           /* eslint-disable no-console */
-          console.log('X is:', x);
+          console.log('X is:', biasedX);
           console.log('y is:', y);
           console.log('beta vector is:', betaVector);
           console.log('local r square of fitting is:', rSquared);
