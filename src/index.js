@@ -86,10 +86,35 @@ module.exports = {
       const pickFeature = getFreeSurferDataPicker(features[0]);
 
       return Promise.all(files.map(f => readFileAsync(f.filename)))
-        .then(freeSurferDatas => ({
-          X: files.map(getNormalizedTags), // covariates
-          y: freeSurferDatas.map(pickFeature), // RoIs
-        }));
+        .then(freeSurferDatas => { // eslint-disable-line arrow-parens
+          const x = files.map(getNormalizedTags); // covariates
+          const y = freeSurferDatas.map(pickFeature); // RoIs
+
+          // calculate regression result and localMeanY
+          const localCount = y.length;
+          const betaVector = regression.oneShot(x, y);
+          const rSquared = regression.rSquared(x, y, betaVector);
+          const tValue = regression.tValue(x, y, betaVector);
+          const localMeanY = n.sum(y) / localCount;
+
+          /* eslint-disable no-console */
+          console.log('X is:', x);
+          console.log('y is:', y);
+          console.log('beta vector is:', betaVector);
+          console.log('local r square of fitting is:', rSquared);
+          console.log('local tValues of betaVector are:', tValue);
+          /* eslint-enable no-console */
+
+          return {
+            betaVector,
+            localCount,
+            localMeanY,
+            rSquared,
+            tValue,
+            x,
+            y,
+          };
+        });
     },
     inputs: [{
       help: 'Select Freesurfer region(s) of interest',
@@ -101,31 +126,7 @@ module.exports = {
       type: 'covariates',
     }],
   }, {
-    // step one: calculate regression result and localMeanY
-    type: 'function',
-    fn(opts) {
-      const previousData = opts.previousData;
-
-      for (let i = 0; i < opts.previousData.X.length; i += 1) {
-        previousData.X[i].splice(0, 0, 1);
-      }
-
-      const betaVector = regression.oneShot(previousData.X, previousData.y);
-      const rSquared = regression.rSquared(previousData.X, previousData.y, betaVector);
-      const tValue = regression.tValue(previousData.X, previousData.y, betaVector);
-      const localMeanY = n.sum(previousData.y) / previousData.y.length;
-      /* eslint-disable no-console */
-      console.log('X is:', previousData.X);
-      console.log('y is:', previousData.y);
-      console.log('beta vector is:', betaVector);
-      console.log('local r square of fitting is:', rSquared);
-      console.log('local tValues of betaVector are:', tValue);
-      /* eslint-enable no-console */
-      return { betaVector, localMeanY, local_n: previousData.y.length };
-    },
-
-  }, {
-     // step two: receive the globalMeanY and calculate part of (y-globalMeanY).^2
+    // step two: receive the globalMeanY and calculate part of (y-globalMeanY).^2
     type: 'function',
     fn(opts) {
       const remoteResults = opts.remoteResults;

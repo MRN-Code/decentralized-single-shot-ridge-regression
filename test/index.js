@@ -61,7 +61,7 @@ tape('local preprocessing: errors', t => {
 });
 
 tape('local preprocessing', t => {
-  t.plan(2);
+  t.plan(6);
 
   preprocess({
     remoteResult: {
@@ -86,8 +86,15 @@ tape('local preprocessing', t => {
     },
   })
     .then(response => {
+      t.equal(response.localCount, 2, 'returns count');
+      t.equal(response.localMeanY, 4150, 'returns mean RoI');
+      t.ok(typeof response.rSquared === 'number', 'returns r^2');
+      t.ok(
+        Array.isArray(response.tValue) && response.tValue.length,
+        'returns t-value'
+      );
       t.deepEqual(
-        response.X,
+        response.x,
         [
           [29, 1],
           [30, -1],
