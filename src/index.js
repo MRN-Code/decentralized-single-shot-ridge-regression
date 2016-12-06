@@ -130,8 +130,7 @@ module.exports = {
     // step two: receive the globalMeanY and calculate part of (y-globalMeanY).^2
     type: 'function',
     fn(opts) {
-      const remoteResults = opts.remoteResults;
-      const globalMeanY = remoteResults.globalMeanY;
+      const globalMeanY = opts.remoteResult.data.globalMeanY;
       /* eslint-disable no-console */
       console.log('globalMeanY:', globalMeanY);
       console.log('previousData is:', opts.previousData[0]);
