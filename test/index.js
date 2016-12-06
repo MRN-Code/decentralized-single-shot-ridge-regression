@@ -5,7 +5,7 @@ const path = require('path');
 const tape = require('tape');
 
 const preprocess = computation.local[0].fn;
-const remote = computation.remote.fn;
+const remote = computation.remote[0].fn;
 
 /* eslint-disable arrow-parens */
 tape('local preprocessing: errors', t => {
@@ -139,11 +139,8 @@ tape('remote function', t => {
         },
         username,
       })),
-    }),
-    {
-      averageBetaVector: [5, 6, 7, 8],
-      complete: true,
-    },
+    }).averageBetaVector,
+    [5, 6, 7, 8],
     'computes average beta'
   );
   t.end();
