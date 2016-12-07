@@ -112,8 +112,6 @@ module.exports = {
             localMeanY,
             rSquared,
             tValue,
-            x,
-            y,
           };
         });
     },
@@ -127,16 +125,39 @@ module.exports = {
       type: 'covariates',
     }],
   }, {
-    // step two: receive the globalMeanY and calculate part of (y-globalMeanY).^2
+    // step two: receive the globalMeanY and averageBetaVector, then calculate sseLocal, sstLocal and varXLocal
     type: 'function',
     fn(opts) {
       const globalMeanY = opts.remoteResult.data.globalMeanY;
+      const averageBetaVector = opts.remoteResult.data.averageBetaVector;
+      const biasedX = opts.previousData.biasedX;
+      const y = opts.previousData.y;
+      const localCount = y.length;
+
+      // calculate sseLocal and sstLocal
+      const sseLocal=n.sum(n.pow(n.sub(y, n.dot(biasedX, averageBetaVector)), 2));
+      const sstLocal=n.sum(n.pow(n.sub(y, n.rep(n.dim(y), globalMeanY)), 2));
+
+      // calculate varXLocal
+      
+      const varXLocalMatrix=n.dot(n.transpose(biasedX),biasedX);
+      const varXLocal=[];
+      for (let i=0; i<averageBetaVector.length; i += 1) {
+         varXLocal.push(varXLocalMatrix[i][i]);
+      }
+    
       /* eslint-disable no-console */
       console.log('globalMeanY:', globalMeanY);
-      console.log('previousData is:', opts.previousData[0]);
+      console.log('opts is:', opts);
       /* eslint-enable no-console */
-      const sstNode = 6765;
-      return { sstNode };
+       
+      return { 
+        sseLocal;
+        sstLocal;
+        varXLocal;
+        averageBetaVector;
+        localCount;
+        };
     },
 
   }],
@@ -149,7 +170,8 @@ module.exports = {
       if (userResults.some(userResult => !((userResult || {}).data || {}).betaVector)) {
         return {};
       }
-
+      
+      // calculate averageBetaVector
       const averageBetaVector = [];
       const betaCount = userResults[0].data.betaVector.length;
       const userCount = userResults.length;
@@ -159,11 +181,22 @@ module.exports = {
           (sum, userResult) => sum + userResult.data.betaVector[i], 0
         ) / userCount);
       }
+      
+      // calculate globalMeanY
+      const siteCount=userResults.length;  
+      var totalY=0;
+      var globalYCount=0;
+       
+      for (let i=0; i < siteCount; i += 1) {
+         totalY += userResults[i].data.localMeanY*userResults[i].data.localCount;
+         globalYCount += userResults[i].data.localCount;
+      } 
 
-      const globalMeanY = 765;
+      const globalMeanY = totalY/globalYCount;
+   
       /* eslint-disable no-console */
       console.log('Average beta vector:', averageBetaVector);
-      console.log('opts.userResults:', userResults[0]);
+      console.log('globalMeanY is :', userResults[0]);
       /* eslint-enable no-console */
 
       return {
@@ -177,10 +210,20 @@ module.exports = {
     // get sstNode from each local node and calculate the statistics
     type: 'function',
     fn(opts) {
-//     console.log('opts.userResults:',opts.userResults[0]);
+    // console.log('opts.userResults:',opts.userResults[0]);
+    // calcuate globalRSquared
+    const userResults = opts.userResults;
+    const sseGlobal = userResults.reduce((sum, userResult) => sum + userResult.data.sseLocal, 0);
+    
+      
       const sstNode1 = opts.userResults[0].data.sstNode;
+      
+
+
       return {
-        sstNode1,
+        averageBetaVector;
+        rSquared;
+        tValue;,
         complete: true,
       };
     },
