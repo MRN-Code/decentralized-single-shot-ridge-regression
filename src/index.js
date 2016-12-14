@@ -5,7 +5,7 @@ const fs = require('fs');
 const FreeSurfer = require('freesurfer-parser');
 const get = require('lodash/get');
 const pkg = require('../package.json');
-const n = require('numeric');
+const n=require('numeric');
 
 /**
  * Get FreeSurfer region of interest picker.
@@ -86,34 +86,10 @@ module.exports = {
       const pickFeature = getFreeSurferDataPicker(features[0]);
 
       return Promise.all(files.map(f => readFileAsync(f.filename)))
-        .then(freeSurferDatas => { // eslint-disable-line arrow-parens
-          const x = files.map(getNormalizedTags); // covariates
-          const y = freeSurferDatas.map(pickFeature); // RoIs
-
-          // calculate regression result and localMeanY
-          const biasedX = x.map(covariates => [1].concat(covariates));
-          const localCount = y.length;
-          const betaVector = regression.oneShot(biasedX, y);
-          const rSquared = regression.rSquared(biasedX, y, betaVector);
-          const tValue = regression.tValue(biasedX, y, betaVector);
-          const localMeanY = n.sum(y) / localCount;
-
-          /* eslint-disable no-console */
-          console.log('X is:', biasedX);
-          console.log('y is:', y);
-          console.log('beta vector is:', betaVector);
-          console.log('local r square of fitting is:', rSquared);
-          console.log('local tValues of betaVector are:', tValue);
-          /* eslint-enable no-console */
-
-          return {
-            betaVector,
-            localCount,
-            localMeanY,
-            rSquared,
-            tValue,
-          };
-        });
+        .then(freeSurferDatas => ({
+          X: files.map(getNormalizedTags), // covariates
+          y: freeSurferDatas.map(pickFeature), // RoIs
+        }));
     },
     inputs: [{
       help: 'Select Freesurfer region(s) of interest',
@@ -125,41 +101,42 @@ module.exports = {
       type: 'covariates',
     }],
   }, {
-    // step two: receive the globalMeanY and averageBetaVector, then calculate sseLocal, sstLocal and varXLocal
+    // step one: calculate regression result and local_meanY 
     type: 'function',
     fn(opts) {
-      const globalMeanY = opts.remoteResult.data.globalMeanY;
-      const averageBetaVector = opts.remoteResult.data.averageBetaVector;
-      const biasedX = opts.previousData.biasedX;
-      const y = opts.previousData.y;
-      const localCount = y.length;
+      const previousData = opts.previousData;
 
-      // calculate sseLocal and sstLocal
-      const sseLocal=n.sum(n.pow(n.sub(y, n.dot(biasedX, averageBetaVector)), 2));
-      const sstLocal=n.sum(n.pow(n.sub(y, n.rep(n.dim(y), globalMeanY)), 2));
-
-      // calculate varXLocal
-      
-      const varXLocalMatrix=n.dot(n.transpose(biasedX),biasedX);
-      const varXLocal=[];
-      for (let i=0; i<averageBetaVector.length; i += 1) {
-         varXLocal.push(varXLocalMatrix[i][i]);
+      for (let i = 0; i < opts.previousData.X.length; i += 1) {
+        previousData.X[i].splice(0, 0, 1);
       }
-    
-      /* eslint-disable no-console */
-      console.log('globalMeanY:', globalMeanY);
-      console.log('opts is:', opts);
-      /* eslint-enable no-console */
-       
-      return { 
-        sseLocal;
-        sstLocal;
-        varXLocal;
-        averageBetaVector;
-        localCount;
-        };
-    },
 
+      const betaVector = regression.oneShot(previousData.X, previousData.y);
+      const rSquared = regression.rSquared(previousData.X,previousData.y,betaVector);
+      const tValue = regression.tValue(previousData.X,previousData.y,betaVector);
+      const local_meanY= n.sum(previousData.y)/previousData.y.length;
+      /* eslint-disable no-console */
+      console.log('X is:', previousData.X);
+      console.log('y is:', previousData.y);
+      console.log('beta vector is:', betaVector);
+      console.log('local r square of fitting is:', rSquared);
+      console.log('local tValues of betaVector are:', tValue);
+      /* eslint-enable no-console */
+      return { 'betaVector':betaVector,'local_meanY':local_meanY,'local_n':previousData.y.length };
+      },
+      
+    }, {
+     // step two: receive the global_meanY and calculate part of (y-global_meanY).^2
+     type: 'function',
+     fn(opts) {
+        
+        const remoteResults=opts.remoteResults;
+        const global_meanY=remoteResults.global_meanY;
+        console.log('global_meanY:',global_meanY);
+        console.log('previousData is:',opts.previousData[0]);
+        const SST_node=6765;
+        return { SST_node };
+     },
+     
   }],
   remote: [{
     type: 'function',
@@ -170,8 +147,7 @@ module.exports = {
       if (userResults.some(userResult => !((userResult || {}).data || {}).betaVector)) {
         return {};
       }
-      
-      // calculate averageBetaVector
+
       const averageBetaVector = [];
       const betaCount = userResults[0].data.betaVector.length;
       const userCount = userResults.length;
@@ -182,52 +158,32 @@ module.exports = {
         ) / userCount);
       }
       
-      // calculate globalMeanY
-      const siteCount=userResults.length;  
-      var totalY=0;
-      var globalYCount=0;
-       
-      for (let i=0; i < siteCount; i += 1) {
-         totalY += userResults[i].data.localMeanY*userResults[i].data.localCount;
-         globalYCount += userResults[i].data.localCount;
-      } 
-
-      const globalMeanY = totalY/globalYCount;
-   
+      const global_meanY=765;
       /* eslint-disable no-console */
       console.log('Average beta vector:', averageBetaVector);
-      console.log('globalMeanY is :', userResults[0]);
       /* eslint-enable no-console */
+      console.log('opts.userResults:', userResults[0]);
 
       return {
         averageBetaVector,
-        globalMeanY,
+        global_meanY,
 //        complete: true,
       };
     },
     verbose: true,
-  }, {
-    // get sstNode from each local node and calculate the statistics
-    type: 'function',
-    fn(opts) {
-    // console.log('opts.userResults:',opts.userResults[0]);
-    // calcuate globalRSquared
-    const userResults = opts.userResults;
-    const sseGlobal = userResults.reduce((sum, userResult) => sum + userResult.data.sseLocal, 0);
-    
-      
-      const sstNode1 = opts.userResults[0].data.sstNode;
-      
-
-
-      return {
-        averageBetaVector;
-        rSquared;
-        tValue;,
-        complete: true,
+  },{
+    // get SST_node from each local node and calculate the statistics
+     type:'function',
+     fn(opts) {
+     const userResults = opts.userResults;
+     console.log('opts.userResults:',opts.userResults[0]);
+     const SST_node1=opts.userResults[0].data.SST_node;
+     return {
+       SST_node1,
+       complete : true,
       };
-    },
-    verbose: true,
-  }],
+     },
+     verbose: true,
+   }],
   plugins: ['group-step', 'inputs'],
 };
