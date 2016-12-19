@@ -102,8 +102,8 @@ module.exports = {
           console.log('X is:', biasedX);
           console.log('y is:', y);
           console.log('beta vector is:', betaVector);
-          console.log('local r squared of original betaVector:', rSquared);
-          console.log('local tValues of original betaVector:', tValue);
+          console.log('local r squared for original betaVector:', rSquared);
+          console.log('local tValues for original betaVector:', tValue);
           /* eslint-enable no-console */
 
           return {
@@ -112,6 +112,8 @@ module.exports = {
             localMeanY,
             rSquared,
             tValue,
+            biasedX,
+            y,
           };
         });
     },
@@ -132,6 +134,9 @@ module.exports = {
       const averageBetaVector = opts.remoteResult.data.averageBetaVector;
       const biasedX = opts.previousData.biasedX;
       const y = opts.previousData.y;
+      const rSquared = opts.previousData.rSquared;
+      const tValue = opts.previousData.tValue;
+      const betaVector = opts.previousData.betaVector;
       const localCount = y.length;
 
       //calculate the local r squred and t value for averageBetaVector)
@@ -156,11 +161,15 @@ module.exports = {
       /* eslint-enable no-console */
        
       return { 
-        sseLocal;
-        sstLocal;
-        varXLocal;
-        averageBetaVector;
-        localCount;
+        sseLocal,
+        sstLocal,
+        varXLocal,
+        averageBetaVector,
+        localCount,
+        rSquared,
+        tValue,
+        rSquaredLocal,
+        tValueLocal,
         };
     },
 
@@ -200,7 +209,7 @@ module.exports = {
    
       /* eslint-disable no-console */
       console.log('Average beta vector:', averageBetaVector);
-      console.log('globalMeanY is :', userResults[0]);
+      console.log('globalMeanY is :', globalMeanY);
       /* eslint-enable no-console */
 
       return {
@@ -214,10 +223,18 @@ module.exports = {
     // get sstNode from each local node and calculate the statistics
     type: 'function',
     fn(opts) {
-    // console.log('opts.userResults:',opts.userResults[0]);
-    // calcuate globalRSquared
-    const averageBetaVector = userResults[0].data.averageBetaVector;
+
     const userResults = opts.userResults;
+
+    // get passed parameters from local nodes
+    const averageBetaVector = userResults[0].data.averageBetaVector;
+    const betaVectorLocal = userReqults.map(r => r.data.betaVector);
+    const rSquaredLocalOriginal = userResults.map(r => r.data.rSquared);
+    const tValueLocalOriginal = userResults.map(r => r.data.tValue);
+    const rSquaredLocal = userResults.map(r => r.data.rSquaredLocal);
+    const tValueLocal = userResults.map(r => r.data.tValueLocal);
+
+    //calculate global parameters
     const sseGlobal = userResults.reduce((sum, userResult) => sum + userResult.data.sseLocal, 0);
     const sstGlobal = userResults.reduce((sum, userResult) => sum + userResult.data.sstLocal, 0);
     const globalYCount = userResults.reduce((sum,userResult) => sum + userResult.data.localCount,0);
@@ -226,22 +243,30 @@ module.exports = {
     const varXGlobal = [];   
     const seBetaGlobal = [];
     const tValueGlobal = [];
-    
+
+   // calculate tValueGlobal 
     for (let i = 0; i < betaCount; i += 1) {
-        varXGlobal[i] = userResults.reduce((sum, userResult) => sum + userResult.data.varXLocal[i], 0 ));
+        varXGlobal[i] = userResults.reduce((sum, userResult) => sum + userResult.data.varXLocal[i], 0 );
         seBetaGlobal[i] = Math.sqrt(varError/varXGlobal[i]);
         tValueGlobal[i] = averageBetaVector[i]/seBetaGlobal[i];
        }
 
-      
+  // calculate r squared global    
     const rSquaredGlobal = 1-(sseGlobal/sstGlobal);
-    console.log('The global r squared is :', rSquaredGlobal);
-    console.log('The global t Value for each beta is :', tValueGlobal);
+
+    console.log('The global r squared for averageBetaVector :', rSquaredGlobal);
+    console.log('The global t Values for averageBetaVector :', tValueGlobal);
+    console.log('The local t Values for averageBetaVector : ', tValueLocal);
 
     return {
-        averageBetaVector;
-        rSquaredGlobal;
-        tValueGlobal;,
+        betaVectorLocal,
+        averageBetaVector,
+        rSquaredLocalOriginal,
+        tValueLocalOriginal,
+        rSquaredLocal,
+        tValueLocal,
+        rSquaredGlobal,
+        tValueGlobal,
         complete: true,
       };
     },
