@@ -6,6 +6,7 @@ const FreeSurfer = require('freesurfer-parser');
 const get = require('lodash/get');
 const pkg = require('../package.json');
 const n = require('numeric');
+const distributions = require('distributions');
 
 /**
  * Get FreeSurfer region of interest picker.
@@ -96,6 +97,9 @@ module.exports = {
           const betaVector = regression.oneShot(biasedX, y);
           const rSquared = regression.rSquared(biasedX, y, betaVector);
           const tValue = regression.tValue(biasedX, y, betaVector);
+          var tdist = distributions.Studentt(localCount-1);
+          const tcdf = tValue.map(r => tdist.cdf(r));
+          const pValue = n.mul(2,n.sub(1,tcdf)); 
           const localMeanY = n.sum(y) / localCount;
 
           /* eslint-disable no-console */
@@ -103,7 +107,8 @@ module.exports = {
           console.log('y is:', y);
           console.log('beta vector is:', betaVector);
           console.log('local r squared for original betaVector:', rSquared);
-          console.log('local tValues for original betaVector:', tValue);
+          console.log('local t Values for original betaVector:', tValue);
+          console.log('local p values for original betaVector:', pValue);
           /* eslint-enable no-console */
 
           return {
@@ -112,6 +117,7 @@ module.exports = {
             localMeanY,
             rSquared,
             tValue,
+            pValue,
             biasedX,
             y,
           };
@@ -136,13 +142,16 @@ module.exports = {
       const y = opts.previousData.y;
       const rSquared = opts.previousData.rSquared;
       const tValue = opts.previousData.tValue;
+      const pValue = opts.previousData.pValue;
       const betaVector = opts.previousData.betaVector;
       const localCount = y.length;
 
       //calculate the local r squred and t value for averageBetaVector)
       const rSquaredLocal = regression.rSquared(biasedX, y, averageBetaVector);
       const tValueLocal = regression.tValue(biasedX, y, averageBetaVector);
-
+      var tdist=distributions.Studentt(localCount-1);
+      const tcdf = tValueLocal.map(r => tdist.cdf(r));
+      const pValueLocal = n.mul(2,n.sub(1,tcdf));
 
       // calculate sseLocal and sstLocal
       const sseLocal=n.sum(n.pow(n.sub(y, n.dot(biasedX, averageBetaVector)), 2));
@@ -157,7 +166,8 @@ module.exports = {
     
       /* eslint-disable no-console */
       console.log('local r squared for averageBetaVector', rSquaredLocal);
-      console.log('local tValues for averageBetaVector', tValueLocal);
+      console.log('local t Values for averageBetaVector', tValueLocal);
+      console.log('local p Values for averageBetaVector', pValueLocal);
       /* eslint-enable no-console */
        
       return { 
@@ -168,8 +178,10 @@ module.exports = {
         localCount,
         rSquared,
         tValue,
+        pValue,
         rSquaredLocal,
         tValueLocal,
+        pValueLocal,
         };
     },
 
@@ -228,11 +240,13 @@ module.exports = {
 
     // get passed parameters from local nodes
     const averageBetaVector = userResults[0].data.averageBetaVector;
-    const betaVectorLocal = userReqults.map(r => r.data.betaVector);
+    const betaVectorLocal = userResults.map(r => r.data.betaVector);
     const rSquaredLocalOriginal = userResults.map(r => r.data.rSquared);
     const tValueLocalOriginal = userResults.map(r => r.data.tValue);
+    const pValueLocalOriginal = userResults.map(r => r.data.pValue);
     const rSquaredLocal = userResults.map(r => r.data.rSquaredLocal);
     const tValueLocal = userResults.map(r => r.data.tValueLocal);
+    const pValueLocal = userResults.map(r => r.data.pValueLocal);
 
     //calculate global parameters
     const sseGlobal = userResults.reduce((sum, userResult) => sum + userResult.data.sseLocal, 0);
@@ -253,20 +267,28 @@ module.exports = {
 
   // calculate r squared global    
     const rSquaredGlobal = 1-(sseGlobal/sstGlobal);
+    
+  // add t to p value transformation //
+    var tdist=distributions.Studentt(globalYCount-1);
+    const tcdf = tValueGlobal.map(r => tdist.cdf(r));
+    const pValueGlobal=n.mul(2,(n.sub(1,tcdf))); // two tail pValue
 
     console.log('The global r squared for averageBetaVector :', rSquaredGlobal);
     console.log('The global t Values for averageBetaVector :', tValueGlobal);
-    console.log('The local t Values for averageBetaVector : ', tValueLocal);
+    console.log('The global p Values for averageBetaVector :', pValueGlobal);
 
     return {
         betaVectorLocal,
         averageBetaVector,
         rSquaredLocalOriginal,
         tValueLocalOriginal,
+        pValueLocalOriginal,
         rSquaredLocal,
         tValueLocal,
+        pValueLocal,
         rSquaredGlobal,
         tValueGlobal,
+        pValueGlobal,
         complete: true,
       };
     },
