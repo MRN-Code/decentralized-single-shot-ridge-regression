@@ -3,6 +3,11 @@
   "bugs": {
     "url": "https://github.com/MRN-Code/decentralized-single-shot-ridge-regression/issues"
   },
+  "coinstac": {
+    "description": "Decentralized ridge regression.",
+    "name": "Single-Shot Ridge Regression",
+    "tags": ["regression"]
+  },
   "contributors": [
     "Cory Reed <swashcap@gmail.com>",
     "Eric Verner <everner@mrn.org>",
