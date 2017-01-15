@@ -6,7 +6,9 @@
   "coinstac": {
     "description": "Decentralized ridge regression.",
     "name": "Single-Shot Ridge Regression",
-    "tags": ["regression"]
+    "tags": [
+      "regression"
+    ]
   },
   "contributors": [
     "Cory Reed <swashcap@gmail.com>",
@@ -59,5 +61,5 @@
     "simulate": "cross-env BLUEBIRD_WARNINGS=0 coinstac-simulator -d test/declaration.js",
     "test": "node test/index.js"
   },
-  "version": "1.1.0"
+  "version": "1.1.1"
 }
