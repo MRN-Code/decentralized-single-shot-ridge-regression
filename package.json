@@ -51,6 +51,11 @@
   },
   "scripts": {
     "lint": "eslint src test",
+    "postversion": "git push origin master --tags && npm publish",
+    "preversion": "git checkout master && git pull && npm ls",
+    "publish-major": "npm run preversion && npm version major && npm run postversion",
+    "publish-minor": "npm run preversion && npm version minor && npm run postversion",
+    "publish-patch": "npm run preversion && npm version patch && npm run postversion",
     "simulate": "cross-env BLUEBIRD_WARNINGS=0 coinstac-simulator -d test/declaration.js",
     "test": "node test/index.js"
   },
