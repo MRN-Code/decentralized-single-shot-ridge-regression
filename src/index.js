@@ -91,6 +91,7 @@ module.exports = {
           const x = files.map(getNormalizedTags); // covariates
           const y = freeSurferDatas.map(pickFeature); // RoIs
 
+          
           // calculate regression result and localMeanY
           const biasedX = x.map(covariates => [1].concat(covariates));
           const localCount = y.length;
@@ -223,10 +224,18 @@ module.exports = {
       console.log('Average beta vector:', averageBetaVector);
       console.log('globalMeanY is :', globalMeanY);
       /* eslint-enable no-console */
+ 
+      // Extract X and y variable name list from userData
+      const y_label=opts.userResults[0].userData.__FEATURES__;
+      const X_label=Object.keys(opts.userResults[0].userData.files[0].tags);
+      console.log('X_label is', X_label);
+      console.log('y_label is',y_label);
 
       return {
         averageBetaVector,
         globalMeanY,
+        X_label,
+        y_label,
 //        complete: true,
       };
     },
@@ -237,6 +246,8 @@ module.exports = {
     fn(opts) {
 
     const userResults = opts.userResults;
+    const X_label=opts.previousData.X_label;
+    const y_label=opts.previousData.y_label;
 
     // get passed parameters from local nodes
     const averageBetaVector = userResults[0].data.averageBetaVector;
@@ -277,6 +288,7 @@ module.exports = {
     console.log('The global t Values for averageBetaVector :', tValueGlobal);
     console.log('The global p Values for averageBetaVector :', pValueGlobal);
 
+  // now each returned variable is full-precision floating number, may need reduce the precision when disply on the table 
     return {
         betaVectorLocal,
         averageBetaVector,
@@ -289,6 +301,8 @@ module.exports = {
         rSquaredGlobal,
         tValueGlobal,
         pValueGlobal,
+        X_label,
+        y_label,
         complete: true,
       };
     },
