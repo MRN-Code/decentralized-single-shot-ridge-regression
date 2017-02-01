@@ -99,7 +99,7 @@ module.exports = {
           const rSquared = regression.rSquared(biasedX, y, betaVector);
           const tValue = regression.tValue(biasedX, y, betaVector);
           /* eslint-disable new-cap */
-          const tdist = distributions.Studentt(localCount - 1);
+          const tdist = distributions.Studentt(localCount - betaVector.length);
           /* eslint-disable new-cap */
           const tcdf = tValue.map(r => tdist.cdf(r));
           const pValue = n.mul(2, n.sub(1, tcdf));
@@ -163,7 +163,7 @@ module.exports = {
       const rSquaredLocal = regression.rSquared(biasedX, y, averageBetaVector);
       const tValueLocal = regression.tValue(biasedX, y, averageBetaVector);
       /* eslint-disable new-cap */
-      const tDist = distributions.Studentt(localCount - 1);
+      const tDist = distributions.Studentt(localCount - averageBetaVector.length);
       /* eslint-disable new-cap */
       const tCdf = tValueLocal.map(r => tDist.cdf(r));
       const pValueLocal = n.mul(2, n.sub(1, tCdf));
@@ -337,7 +337,7 @@ module.exports = {
       }
 
       const rSquaredGlobal = 1 - (sseGlobal / sstGlobal);
-      const tDist = distributions.Studentt(globalYCount - 1);
+      const tDist = distributions.Studentt(globalYCount - averageBetaVector.length);
       const tCdf = tValueGlobal.map(r => tDist.cdf(r));
       const pValueGlobal = n.mul(2, (n.sub(1, tCdf))); // two tail pValue
 
