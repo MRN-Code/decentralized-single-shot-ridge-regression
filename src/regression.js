@@ -17,7 +17,7 @@ module.exports = {
     console.log('xVals are:', xVals);
     console.log('yVals are:', yVals);
     console.log('localInitialMVals are:', localInitialMVals);
-    /* eslint-enable no-console */
+    /* eslint-disable no-console */
     return n.uncmin(w => this.objective(w, xVals, yVals), localInitialMVals, 0.001).solution;
   },
 
@@ -29,9 +29,7 @@ module.exports = {
   },
 
   tValue(xVals, yVals, betaVector) {
-    const varError =
-      (1 / (n.dim(yVals) - 2)) *
-      (n.sum(n.pow(n.sub(yVals, n.dot(xVals, betaVector)), 2)));
+    const varError = (1 / (n.dim(yVals) - n.dim(betaVector))) * (n.sum(n.pow(n.sub(yVals, n.dot(xVals, betaVector)), 2)));
     const varBeta = n.mul(n.inv(n.dot(n.transpose(xVals), xVals)), varError);
    // initialize seBeta list
     const seBeta = [];

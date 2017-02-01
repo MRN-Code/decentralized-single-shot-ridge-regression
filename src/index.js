@@ -324,7 +324,7 @@ module.exports = {
 //      }
 //     );
 
-      const varError = (1 / (globalYCount - 2)) * sseGlobal;
+      const varError = (1 / (globalYCount - averageBetaVector.length)) * sseGlobal;
       const varXGlobal = [];
       const seBetaGlobal = [];
       const tValueGlobal = [];
@@ -347,7 +347,7 @@ module.exports = {
       console.log('The global p Values for averageBetaVector :', pValueGlobal);
      /* eslint-disable no-console */
 
-      return {
+      const result = {
         betaVectorLocal,
         averageBetaVector,
         rSquaredLocalOriginal,
@@ -363,6 +363,10 @@ module.exports = {
         yLabel,
         complete: true,
       };
+     
+      console.log('Final result!', result);
+
+      return result;
     },
     verbose: true,
   }],
