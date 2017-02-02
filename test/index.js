@@ -5,7 +5,7 @@ const path = require('path');
 const tape = require('tape');
 
 const preprocess = computation.local[0].fn;
-const remote = computation.remote.fn;
+const remote = computation.remote[0].fn;
 
 /* eslint-disable arrow-parens */
 tape('local preprocessing: errors', t => {
@@ -61,7 +61,7 @@ tape('local preprocessing: errors', t => {
 });
 
 tape('local preprocessing', t => {
-  t.plan(2);
+  t.plan(6);
 
   preprocess({
     remoteResult: {
@@ -86,8 +86,15 @@ tape('local preprocessing', t => {
     },
   })
     .then(response => {
+      t.equal(response.localCount, 2, 'returns count');
+      t.equal(response.localMeanY, 4150, 'returns mean RoI');
+      t.ok(typeof response.rSquared === 'number', 'returns r^2');
+      t.ok(
+        Array.isArray(response.tValue) && response.tValue.length,
+        'returns t-value'
+      );
       t.deepEqual(
-        response.X,
+        response.x,
         [
           [29, 1],
           [30, -1],
@@ -139,11 +146,8 @@ tape('remote function', t => {
         },
         username,
       })),
-    }),
-    {
-      averageBetaVector: [5, 6, 7, 8],
-      complete: true,
-    },
+    }).averageBetaVector,
+    [5, 6, 7, 8],
     'computes average beta'
   );
   t.end();

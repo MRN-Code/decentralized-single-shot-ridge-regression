@@ -18,6 +18,7 @@
   ],
   "description": "Single shot implementation of ridge regression in python for COINSTAC.",
   "dependencies": {
+    "distributions": "^1.0.0",
     "freesurfer-parser": "0.0.2",
     "lodash": "^4.17.2",
     "numeric": "^1.2.6"
