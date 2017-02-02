@@ -363,7 +363,7 @@ module.exports = {
         yLabel,
         complete: true,
       };
-     
+
       console.log('Final result!', result);
 
       return result;

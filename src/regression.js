@@ -29,7 +29,8 @@ module.exports = {
   },
 
   tValue(xVals, yVals, betaVector) {
-    const varError = (1 / (n.dim(yVals) - n.dim(betaVector))) * (n.sum(n.pow(n.sub(yVals, n.dot(xVals, betaVector)), 2)));
+    const varError = (1 / (n.dim(yVals) - n.dim(betaVector))) *
+      (n.sum(n.pow(n.sub(yVals, n.dot(xVals, betaVector)), 2)));
     const varBeta = n.mul(n.inv(n.dot(n.transpose(xVals), xVals)), varError);
    // initialize seBeta list
     const seBeta = [];
