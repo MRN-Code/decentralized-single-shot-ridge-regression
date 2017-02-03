@@ -170,7 +170,6 @@ module.exports = {
       const sseLocal = n.sum(n.pow(n.sub(y, n.dot(biasedX, averageBetaVector)), 2));
       const sstLocal = n.sum(n.pow(n.sub(y, n.rep(n.dim(y), globalMeanY)), 2));
       const varXLocalMatrix = n.dot(n.transpose(biasedX), biasedX);
-      const varXLocal = varXLocalMatrix.map((column, index) => column[index]);
 
       /* eslint-disable no-console */
       console.log('local r squared for averageBetaVector', rSquaredLocal);
@@ -182,7 +181,7 @@ module.exports = {
         betaVector,
         sseLocal,
         sstLocal,
-        varXLocal,
+        varXLocalMatrix,
         averageBetaVector,
         localCount,
         rSquared,
@@ -325,14 +324,22 @@ module.exports = {
 //     );
 
       const varError = (1 / (globalYCount - averageBetaVector.length)) * sseGlobal;
-      const varXGlobal = [];
       const seBetaGlobal = [];
       const tValueGlobal = [];
 
+      //calculate tValueGlobal
+      var varXGlobalMatrix=n.rep([averageBetaVector.length,averageBetaVector.length],0);
+
+      for (let i=0; i < userResults.length; i += 1) {
+          varXGlobalMatrix = n.add(varXGlobalMatrix, userResults[i].data.varXLocalMatrix);
+        };
+      
+      console.log('varXGlobalMatrix is', varXGlobalMatrix);
+
+      const varBetaGlobal = n.mul(n.inv(varXGlobalMatrix),varError);
+
       for (let i = 0; i < averageBetaVector.length; i += 1) {
-        varXGlobal[i] = userResults.reduce((sum, userResult) => sum +
-             userResult.data.varXLocal[i], 0);
-        seBetaGlobal[i] = Math.sqrt(varError / varXGlobal[i]);
+        seBetaGlobal[i] = Math.sqrt(varBetaGlobal[i][i]);
         tValueGlobal[i] = averageBetaVector[i] / seBetaGlobal[i];
       }
 
