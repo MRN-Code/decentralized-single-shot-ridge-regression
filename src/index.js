@@ -132,6 +132,13 @@ module.exports = {
       type: 'select',
       values: FreeSurfer.validFields,
     }, {
+      defaultValue: 1,
+      label: 'Lambda',
+      max: 1,
+      min: 0,
+      step: 0.05,
+      type: 'number',
+    }, {
       label: 'Covariates',
       type: 'covariates',
     }],
