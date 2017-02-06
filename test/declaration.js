@@ -1,15 +1,16 @@
 'use strict';
 
+const { DEFAULT_LAMBDA, DECLARATION_INPUTS_KEY } = require('../src/constants.js');
 const path = require('path');
 
-const features = ['Left-Hippocampus'];
+const inputs = [[['Left-Hippocampus'], DEFAULT_LAMBDA]];
 const mocksPath = path.join(__dirname, 'mocks');
 
 module.exports = {
   computationPath: path.resolve(__dirname, '../src/index.js'),
   local: [
     {
-      __FEATURES__: features,
+      [DECLARATION_INPUTS_KEY]: inputs,
       files: [
         {
           filename: path.join(mocksPath, 'M1.txt'),
@@ -44,7 +45,7 @@ module.exports = {
       name: 'project-1',
     },
     {
-      __FEATURES__: features,
+      [DECLARATION_INPUTS_KEY]: inputs,
       files: [
         {
           filename: path.join(mocksPath, 'M1.txt'),
