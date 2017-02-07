@@ -327,16 +327,18 @@ module.exports = {
       const seBetaGlobal = [];
       const tValueGlobal = [];
 
-      //calculate tValueGlobal
-      var varXGlobalMatrix=n.rep([averageBetaVector.length,averageBetaVector.length],0);
+      // calculate tValueGlobal
+      let varXGlobalMatrix = n.rep([averageBetaVector.length, averageBetaVector.length], 0);
 
-      for (let i=0; i < userResults.length; i += 1) {
-          varXGlobalMatrix = n.add(varXGlobalMatrix, userResults[i].data.varXLocalMatrix);
-        };
-      
+      for (let i = 0; i < userResults.length; i += 1) {
+        varXGlobalMatrix = n.add(varXGlobalMatrix, userResults[i].data.varXLocalMatrix);
+      }
+
+      /* eslint-disable no-console */
       console.log('varXGlobalMatrix is', varXGlobalMatrix);
+      /* eslint-enable no-console */
 
-      const varBetaGlobal = n.mul(n.inv(varXGlobalMatrix),varError);
+      const varBetaGlobal = n.mul(n.inv(varXGlobalMatrix), varError);
 
       for (let i = 0; i < averageBetaVector.length; i += 1) {
         seBetaGlobal[i] = Math.sqrt(varBetaGlobal[i][i]);

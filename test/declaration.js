@@ -25,14 +25,14 @@ module.exports = {
             age: 35,
           },
         },
-       {
+        {
           filename: path.join(mocksPath, 'M3.txt'),
           tags: {
             isControl: true,
             age: 50,
           },
         },
-       {
+        {
           filename: path.join(mocksPath, 'M4.txt'),
           tags: {
             isControl: false,
