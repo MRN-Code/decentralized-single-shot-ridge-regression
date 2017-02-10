@@ -219,7 +219,7 @@ module.exports = {
 
       const globalMeanY =
           n.sum(
-             userResults.map(result => result.localMeanY * result.data.localCount)
+             userResults.map(result => result.data.localMeanY * result.data.localCount)
           ) /
           n.sum(
              userResults.map(result => result.data.localCount)
