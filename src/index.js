@@ -268,7 +268,6 @@ module.exports = {
     type: 'function',
     fn(opts) {
       const {
-       previousData: { xLabel, yLabel },
         userResults,
         userResults: [{
           data: { averageBetaVector },
@@ -325,21 +324,31 @@ module.exports = {
       /* eslint-disable no-console */
 
       const result = {
-        betaVectorLocal,
-        averageBetaVector,
-        rSquaredLocalOriginal,
-        tValueLocalOriginal,
-        pValueLocalOriginal,
-        rSquaredLocal,
-        tValueLocal,
-        pValueLocal,
-        rSquaredGlobal,
-        tValueGlobal,
-        pValueGlobal,
-        xLabel,
-        yLabel,
         complete: true,
+        global: {
+          betaVector: averageBetaVector,
+          pValue: pValueGlobal,
+          rSquared: rSquaredGlobal,
+          tValue: tValueGlobal,
+        },
       };
+
+      /**
+       * Iterate over users' statistics and append to results document.
+       *
+       * @todo Improve performance by removing redundant iteration.
+       */
+      betaVectorLocal.forEach((betaVector, i) => {
+        result[i] = {
+          betaVector,
+          pValue: pValueLocal[i],
+          pValueOriginal: pValueLocalOriginal[i],
+          rSquared: rSquaredLocal[i],
+          rSquaredOriginal: rSquaredLocalOriginal[i],
+          tValue: tValueLocal[i],
+          tValueOriginal: tValueLocalOriginal[i],
+        };
+      });
 
       console.log('Final result!', result);
 
