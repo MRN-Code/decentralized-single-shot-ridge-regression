@@ -269,12 +269,11 @@ module.exports = {
     fn(opts) {
       const {
        previousData: { xLabel, yLabel },
-       userResults,
-       userResults: [{
-        data: { averageBetaVector },
+        userResults,
+        userResults: [{
+          data: { averageBetaVector },
         }],
-     } = opts;
-
+      } = opts;
 
       const betaVectorLocal = userResults.map(r => r.data.betaVector);
       const rSquaredLocalOriginal = userResults.map(r => r.data.rSquared);
