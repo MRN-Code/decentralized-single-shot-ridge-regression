@@ -1,83 +1,26 @@
 'use strict';
 
+const { DEFAULT_LAMBDA, DECLARATION_INPUTS_KEY } = require('../src/constants.js');
+const random = require('lodash/random');
 const path = require('path');
 
-const features = ['Left-Hippocampus'];
+const inputs = [[['Left-Hippocampus'], DEFAULT_LAMBDA]];
 const mocksPath = path.join(__dirname, 'mocks');
 
 module.exports = {
   computationPath: path.resolve(__dirname, '../src/index.js'),
   local: [
-    {
-      __FEATURES__: features,
-      files: [
-        {
-          filename: path.join(mocksPath, 'M1.txt'),
-          tags: {
-            isControl: true,
-            age: 36,
-          },
-        },
-        {
-          filename: path.join(mocksPath, 'M2.txt'),
-          tags: {
-            isControl: false,
-            age: 35,
-          },
-        },
-        {
-          filename: path.join(mocksPath, 'M3.txt'),
-          tags: {
-            isControl: true,
-            age: 50,
-          },
-        },
-        {
-          filename: path.join(mocksPath, 'M4.txt'),
-          tags: {
-            isControl: false,
-            age: 18,
-          },
-        },
-
-      ],
-      name: 'project-1',
-    },
-    {
-      __FEATURES__: features,
-      files: [
-        {
-          filename: path.join(mocksPath, 'M1.txt'),
-          tags: {
-            isControl: true,
-            age: 27,
-          },
-        },
-        {
-          filename: path.join(mocksPath, 'M2.txt'),
-          tags: {
-            isControl: false,
-            age: 56,
-          },
-        },
-        {
-          filename: path.join(mocksPath, 'M3.txt'),
-          tags: {
-            isControl: true,
-            age: 38,
-          },
-        },
-        {
-          filename: path.join(mocksPath, 'M4.txt'),
-          tags: {
-            isControl: false,
-            age: 49,
-          },
-        },
-
-      ],
-      name: 'project-2',
-    },
-  ],
+    ['M1.txt', 'M2.txt', 'M3.txt', 'M4.txt'],
+    ['M5.txt', 'M6.txt', 'M7.txt', 'M8.txt'],
+  ].map(files => ({
+    [DECLARATION_INPUTS_KEY]: inputs,
+    files: files.map(file => ({
+      filename: path.join(mocksPath, file),
+      tags: {
+        age: random(18, 65),
+        isControl: Math.random() > 0.5,
+      },
+    })),
+  })),
   verbose: true,
 };

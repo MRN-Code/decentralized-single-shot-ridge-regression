@@ -1,12 +1,14 @@
 'use strict';
 
 const regression = require('./regression');
+const { DEFAULT_LAMBDA, DECLARATION_INPUTS_KEY } = require('./constants.js');
 const fs = require('fs');
 const FreeSurfer = require('freesurfer-parser');
 const get = require('lodash/get');
 const pkg = require('../package.json');
 const n = require('numeric');
 const distributions = require('distributions');
+
 
 /**
  * Get FreeSurfer region of interest picker.
@@ -65,12 +67,14 @@ module.exports = {
     type: 'function',
     fn(opts) {
       let features = get(opts, 'remoteResult.pluginState.inputs[0][0]');
+      let lambda = get(opts, 'remoteResult.pluginState.inputs[0][1]');
       const files = get(opts, 'userData.files');
 
       // TODO: This is a hack for simulator. Figure out how to load plugin state
       /* eslint-disable no-underscore-dangle */
-      if (!features && opts.userData.__FEATURES__) {
-        features = opts.userData.__FEATURES__;
+      if (!features && opts.userData[DECLARATION_INPUTS_KEY]) {
+        features = opts.userData[DECLARATION_INPUTS_KEY][0][0];
+        lambda = opts.userData[DECLARATION_INPUTS_KEY][0][1];
       }
       /* eslint-enable no-underscore-dangle */
 
@@ -82,6 +86,8 @@ module.exports = {
         ));
       } else if (!Array.isArray(files) || !files.length) {
         return Promise.reject(new Error('Expected user data to contain files'));
+      } else if (typeof lambda !== 'number') {
+        return Promise.reject(new Error('Lambda required'));
       }
 
       const pickFeature = getFreeSurferDataPicker(features[0]);
@@ -95,7 +101,7 @@ module.exports = {
           // calculate regression result and localMeanY
           const biasedX = x.map(covariates => [1].concat(covariates));
           const localCount = y.length;
-          const betaVector = regression.oneShot(biasedX, y);
+          const betaVector = regression.oneShot(biasedX, y, lambda);
           const rSquared = regression.rSquared(biasedX, y, betaVector);
           const tValue = regression.tValue(biasedX, y, betaVector);
           /* eslint-disable new-cap */
@@ -131,6 +137,13 @@ module.exports = {
       label: 'Freesurfer ROI',
       type: 'select',
       values: FreeSurfer.validFields,
+    }, {
+      defaultValue: DEFAULT_LAMBDA,
+      label: 'Lambda',
+      max: 1,
+      min: 0,
+      step: 0.05,
+      type: 'number',
     }, {
       label: 'Covariates',
       type: 'covariates',
