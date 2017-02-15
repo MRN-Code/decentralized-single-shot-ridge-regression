@@ -268,13 +268,11 @@ module.exports = {
     type: 'function',
     fn(opts) {
       const {
-       previousData: { xLabel, yLabel },
-       userResults,
-       userResults: [{
-        data: { averageBetaVector },
+        userResults,
+        userResults: [{
+          data: { averageBetaVector },
         }],
-     } = opts;
-
+      } = opts;
 
       const betaVectorLocal = userResults.map(r => r.data.betaVector);
       const rSquaredLocalOriginal = userResults.map(r => r.data.rSquared);
@@ -284,57 +282,13 @@ module.exports = {
       const tValueLocal = userResults.map(r => r.data.tValueLocal);
       const pValueLocal = userResults.map(r => r.data.pValueLocal);
 
-    // calculate global parameters
+      // calculate global parameters
       const sseGlobal = userResults.reduce((sum, userResult) => sum +
                         userResult.data.sseLocal, 0);
       const sstGlobal = userResults.reduce((sum, userResult) => sum +
                         userResult.data.sstLocal, 0);
       const globalYCount = userResults.reduce((sum, userResult) => sum +
                            userResult.data.localCount, 0);
-
-//         const totals = userResults.reduce(
-//      (
-//        memo,
-//      {
-//        data: {
-//           betaVector,
-//           localCount,
-//           pValue,
-//           pValueLocal,
-//           rSquared,
-//           rSquaredLocal,
-//           sseLocal,
-//           sstLocal,
-//           tValue,
-//           tValueLocal,
-//        },
-//      },
-//     ) => {
-//       memo.betaVector.push(betaVector);
-//       memo.globalYCount += localCount;
-//       memo.pValue.push(pValue);
-//       memo.pValueLocal.push(pValueLocal);
-//       memo.rSquared.push(rSquared);
-//       memo.rSquaredLocal.push(rSquaredLocal);
-//       memo.sseGlobal += sseLocal;
-//       memo.sstGlobal += sstLocal;
-//       memo.tValue.push(tValue);
-//       memo.tValueLocal.push(tValueLocal);
-//       return memo;
-//       },
-//      {
-//       betaVector: [],
-//       globalYCount: 0,
-//       pValue: [],
-//       pValueLocal: [],
-//       rSquared: [],
-//       rSquaredLocal: [],
-//       sseGlobal: 0,
-//       sstGlobal: 0,
-//       tValue: [],
-//       tValueLocal: [],
-//      }
-//     );
 
       const varError = (1 / (globalYCount - averageBetaVector.length)) * sseGlobal;
       const seBetaGlobal = [];
@@ -363,28 +317,38 @@ module.exports = {
       const tCdf = tValueGlobal.map(r => tDist.cdf(Math.abs(r)));
       const pValueGlobal = n.mul(2, (n.sub(1, tCdf))); // two tail pValue
 
-     /* eslint-disable no-console */
+      /* eslint-disable no-console */
       console.log('The global r squared for averageBetaVector :', rSquaredGlobal);
       console.log('The global t Values for averageBetaVector :', tValueGlobal);
       console.log('The global p Values for averageBetaVector :', pValueGlobal);
-     /* eslint-disable no-console */
+      /* eslint-disable no-console */
 
       const result = {
-        betaVectorLocal,
-        averageBetaVector,
-        rSquaredLocalOriginal,
-        tValueLocalOriginal,
-        pValueLocalOriginal,
-        rSquaredLocal,
-        tValueLocal,
-        pValueLocal,
-        rSquaredGlobal,
-        tValueGlobal,
-        pValueGlobal,
-        xLabel,
-        yLabel,
         complete: true,
+        global: {
+          betaVector: averageBetaVector,
+          pValue: pValueGlobal,
+          rSquared: rSquaredGlobal,
+          tValue: tValueGlobal,
+        },
       };
+
+      /**
+       * Iterate over users' statistics and append to results document.
+       *
+       * @todo Improve performance by removing redundant iteration.
+       */
+      betaVectorLocal.forEach((betaVector, i) => {
+        result[i] = {
+          betaVector,
+          pValue: pValueLocal[i],
+          pValueOriginal: pValueLocalOriginal[i],
+          rSquared: rSquaredLocal[i],
+          rSquaredOriginal: rSquaredLocalOriginal[i],
+          tValue: tValueLocal[i],
+          tValueOriginal: tValueLocalOriginal[i],
+        };
+      });
 
       console.log('Final result!', result);
 
