@@ -107,7 +107,7 @@ module.exports = {
           /* eslint-disable new-cap */
           const tdist = distributions.Studentt(localCount - betaVector.length);
           /* eslint-disable new-cap */
-          const tcdf = tValue.map(r => tdist.cdf(r));
+          const tcdf = tValue.map(r => tdist.cdf(Math.abs(r)));
           const pValue = n.mul(2, n.sub(1, tcdf));
           const localMeanY = n.sum(y) / localCount;
 
@@ -178,7 +178,7 @@ module.exports = {
       /* eslint-disable new-cap */
       const tDist = distributions.Studentt(localCount - averageBetaVector.length);
       /* eslint-disable new-cap */
-      const tCdf = tValueLocal.map(r => tDist.cdf(Math.abs(Math.abs(r))));
+      const tCdf = tValueLocal.map(r => tDist.cdf(Math.abs((r))));
       const pValueLocal = n.mul(2, n.sub(1, tCdf));
       const sseLocal = n.sum(n.pow(n.sub(y, n.dot(biasedX, averageBetaVector)), 2));
       const sstLocal = n.sum(n.pow(n.sub(y, n.rep(n.dim(y), globalMeanY)), 2));
