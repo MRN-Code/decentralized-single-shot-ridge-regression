@@ -62,5 +62,5 @@
     "simulate": "cross-env BLUEBIRD_WARNINGS=0 coinstac-simulator -d test/declaration.js",
     "test": "node test/index.js"
   },
-  "version": "1.1.5"
+  "version": "1.1.6"
 }
