@@ -1,5 +1,6 @@
 'use strict';
 
+const alphanumSort = require('alphanum-sort');
 const regression = require('./regression');
 const { DEFAULT_LAMBDA, DECLARATION_INPUTS_KEY } = require('./constants.js');
 const fs = require('fs');
@@ -136,7 +137,10 @@ module.exports = {
       help: 'Select Freesurfer region(s) of interest',
       label: 'Freesurfer ROI',
       type: 'select',
-      values: FreeSurfer.validFields,
+      values: alphanumSort(
+        FreeSurfer.validFields.filter(field => field !== 'header'),
+        { insensitive: true }
+      ),
     }, {
       defaultValue: DEFAULT_LAMBDA,
       label: 'Lambda',
