@@ -54,7 +54,7 @@ lhCorticalWhiteMatterVol 218000
 rhCorticalWhiteMatterVol 217500
 CorticalWhiteMatterVol 435500
 SubCortGrayVol 58000
-TotalGrayVol 595000
+TotalGrayVol 535000
 SupraTentorialVol 950000
 SupraTentorialVolNotVent 940000
 SupraTentorialVolNotVentVox 940000
