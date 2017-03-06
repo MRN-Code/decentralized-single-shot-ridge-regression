@@ -1,5 +1,5 @@
-filename,isControl
-M5.txt,1
-M6.txt,1
-M7.txt,0
-M8.txt,0
+filename,isControl,age
+M5.txt,1,67
+M6.txt,1,45
+M7.txt,0,27
+M8.txt,0,38

@@ -18,7 +18,12 @@ module.exports = {
     [{
       name: 'Is Control',
       type: 'boolean',
+    },
+     {
+      name: 'age',
+      type: 'number'
     }],
+    
   ]],
   computationPath: path.resolve(__dirname, '../src/index.js'),
   local: [{
