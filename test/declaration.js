@@ -13,7 +13,7 @@ module.exports = {
    * {@link https://github.com/MRN-Code/coinstac/issues/161}
    */
   __ACTIVE_COMPUTATION_INPUTS__: [[
-    ['TotalGrayVol'], // FreeSurfer region of interest
+    ['Right-Cerebellum-Cortex'], // FreeSurfer region of interest
     DEFAULT_LAMBDA, // Lambda
     [{
       name: 'Is Control',
@@ -25,13 +25,31 @@ module.exports = {
   ]],
   computationPath: path.resolve(__dirname, '../src/index.js'),
   local: [{
-    metaFilePath: path.join(__dirname, 'mocks/metadata-1.csv'),
+    metaFilePath: path.join(__dirname, '20170216-coinstac-test-data/site1/site1_Covariate.csv'),
     metaCovariateMapping: {
       1: 0,
       2: 1,
     },
   }, {
-    metaFilePath: path.join(__dirname, 'mocks/metadata-2.csv'),
+    metaFilePath: path.join(__dirname, '20170216-coinstac-test-data/site2/site2_Covariate.csv'),
+    metaCovariateMapping: {
+      1: 0,
+      2: 1,
+    },
+  }, {
+    metaFilePath: path.join(__dirname, '20170216-coinstac-test-data/site3/site3_Covariate.csv'),
+    metaCovariateMapping: {
+      1: 0,
+      2: 1,
+    },
+  }, { 
+    metaFilePath: path.join(__dirname, '20170216-coinstac-test-data/site4/site4_Covariate.csv'),
+    metaCovariateMapping: {
+      1: 0,
+      2: 1,
+    }, 
+  }, {
+    metaFilePath: path.join(__dirname, '20170216-coinstac-test-data/site5/site5_Covariate.csv'),
     metaCovariateMapping: {
       1: 0,
       2: 1,
