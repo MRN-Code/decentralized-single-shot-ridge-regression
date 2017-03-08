@@ -42,12 +42,12 @@ module.exports = {
       1: 0,
       2: 1,
     },
-  }, { 
+  }, {
     metaFilePath: path.join(__dirname, '20170216-coinstac-test-data/site4/site4_Covariate.csv'),
     metaCovariateMapping: {
       1: 0,
       2: 1,
-    }, 
+    },
   }, {
     metaFilePath: path.join(__dirname, '20170216-coinstac-test-data/site5/site5_Covariate.csv'),
     metaCovariateMapping: {
