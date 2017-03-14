@@ -156,3 +156,49 @@ tape('remote function', t => {
 });
 /* eslint-enable arrow-parens */
 
+tape('degrees of freedom', (t) => {
+  function getUserResult(localCount) {
+    return {
+      data: {
+        averageBetaVector: [Math.random(), Math.random()],
+        betaVector: [Math.random(), Math.random()],
+        localCount,
+        pValue: Math.random(),
+        pValueLocal: Math.random(),
+        rSquared: Math.random(),
+        rSquaredLocal: Math.random(),
+        sseLocal: Math.random(),
+        sstLocal: Math.random(),
+        tValue: Math.random(),
+        tValueLocal: Math.random(),
+        varXLocalMatrix: [
+          [Math.random(), Math.random()],
+          [Math.random(), Math.random()],
+        ],
+      },
+    };
+  }
+
+  const result = computation.remote[1].fn({
+    userResults: [
+      getUserResult(100),
+      getUserResult(50),
+      getUserResult(10),
+    ],
+  });
+
+  t.equal(
+    result.global.degreesOfFreedom,
+    158,
+    'returns global degrees of freedom'
+  );
+  t.ok(
+    result[0].degreesOfFreedom === 98 &&
+    result[1].degreesOfFreedom === 48 &&
+    result[2].degreesOfFreedom === 8,
+    'returns users\'s degrees of freedom'
+  );
+
+  t.end();
+});
+
